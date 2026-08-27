@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'health'
-  s.version          = '13.3.1'
+  s.version          = '13.4.0'
   s.summary          = 'Wrapper for Apple\'s HealthKit on iOS and Google\'s Health Connect on Android.'
   s.description      = <<-DESC
 Wrapper for Apple's HealthKit on iOS and Google's Health Connect on Android.
@@ -20,4 +20,3 @@ Wrapper for Apple's HealthKit on iOS and Google's Health Connect on Android.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.swift_version = '5.0'
 end
-
