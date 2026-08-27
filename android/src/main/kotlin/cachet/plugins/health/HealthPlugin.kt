@@ -151,6 +151,7 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                     requestHealthDataInBackgroundAuthorization(call, result)
             "isSkinTemperatureAvailable" ->
                     dataOperations.isSkinTemperatureAvailable(call, result)
+            "isDataTypeAvailableOnDevice" -> result.success(true)
 
             // Reading data
             "getData" -> dataReader.getData(call, result)

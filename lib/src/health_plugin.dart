@@ -72,6 +72,16 @@ class Health {
   bool isDataTypeAvailable(HealthDataType dataType) =>
       Platform.isAndroid ? dataTypeKeysAndroid.contains(dataType) : dataTypeKeysIOS.contains(dataType);
 
+  /// Checks whether [dataType] is available on this device's OS version.
+  ///
+  /// Unlike [isDataTypeAvailable], this distinguishes HealthKit types added in
+  /// later iOS releases. Platform support is checked before invoking native
+  /// code, so unsupported Android and iOS types return false without a call.
+  Future<bool> isDataTypeAvailableOnDevice(HealthDataType dataType) async {
+    if (!isDataTypeAvailable(dataType)) return false;
+    return await _channel.invokeMethod<bool>('isDataTypeAvailableOnDevice', dataType.name) ?? false;
+  }
+
   /// Check if a given data type is available on this device.
   /// Currently only needed for Android Skin Temperature support.
   Future<void> _checkIfDataTypeAvailableOnDevice(HealthDataType dataType) async {
@@ -1241,10 +1251,7 @@ class Health {
   /// Fetch the next page of changes for a previously created token.
   ///
   /// Android only. Returns null on iOS or if an error occurs.
-  Future<HealthChangesResponse?> getChanges({
-    required String changesToken,
-    bool includeSelf = false,
-  }) async {
+  Future<HealthChangesResponse?> getChanges({required String changesToken, bool includeSelf = false}) async {
     if (Platform.isIOS) return null;
 
     await _checkIfHealthConnectAvailableOnAndroid();

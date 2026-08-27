@@ -58,6 +58,13 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         case "checkIfHealthDataAvailable":
             healthDataOperations.checkIfHealthDataAvailable(call: call, result: result)
 
+        case "isDataTypeAvailableOnDevice":
+            guard let type = call.arguments as? String else {
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "A health data type is required", details: nil))
+                return
+            }
+            result(dataTypesDict[type] != nil || characteristicsTypesDict[type] != nil)
+
         case "requestAuthorization":
             do {
                 try healthDataOperations.requestAuthorization(call: call, result: result)

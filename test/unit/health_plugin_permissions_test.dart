@@ -18,6 +18,14 @@ void main() {
   });
 
   group('Permissions', () {
+    test('isDataTypeAvailableOnDevice forwards a platform-supported type', () async {
+      ctx.channel.when('isDataTypeAvailableOnDevice', true);
+
+      expect(await ctx.health.isDataTypeAvailableOnDevice(HealthDataType.HEART_RATE), isTrue);
+      final call = ctx.channel.lastCallFor('isDataTypeAvailableOnDevice');
+      expect(call?.arguments, HealthDataType.HEART_RATE.name);
+    });
+
     test('hasPermissions throws when permissions length mismatches types', () {
       expect(
         () => ctx.health.hasPermissions(
@@ -31,9 +39,7 @@ void main() {
     test('hasPermissions forwards default permissions', () async {
       ctx.channel.when('hasPermissions', true);
 
-      final result = await ctx.health.hasPermissions(
-        [HealthDataType.HEART_RATE, HealthDataType.WEIGHT],
-      );
+      final result = await ctx.health.hasPermissions([HealthDataType.HEART_RATE, HealthDataType.WEIGHT]);
 
       expect(result, isTrue);
       final call = ctx.channel.lastCallFor('hasPermissions');
@@ -55,10 +61,8 @@ void main() {
 
     test('requestAuthorization rejects write access for read-only types', () {
       expect(
-        () => ctx.health.requestAuthorization(
-          [HealthDataType.ELECTROCARDIOGRAM],
-          permissions: [HealthDataAccess.WRITE],
-        ),
+        () =>
+            ctx.health.requestAuthorization([HealthDataType.ELECTROCARDIOGRAM], permissions: [HealthDataAccess.WRITE]),
         throwsA(isA<ArgumentError>()),
       );
     });
