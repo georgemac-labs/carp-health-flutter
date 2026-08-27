@@ -1,3 +1,10 @@
+## 13.4.0
+
+* Add activity-specific running, cycling, and rowing speed, power, cadence, and distance metrics from HealthKit on their supported iOS versions.
+* Add generic power and cycling cadence read, write, change tracking, permission, deletion, and average aggregation support for Health Connect.
+* Add `WATT` and `REVOLUTIONS_PER_MINUTE` units.
+* Add optional HealthKit workout metadata for indoor workouts, average METs, average speed, and maximum speed.
+
 ## 13.3.1
 
 * iOS: Fix issues with app crashing on iOS 15

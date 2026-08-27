@@ -67,5 +67,23 @@ void main() {
       expect(response.upsertedDataPoints, hasLength(1));
       expect(response.deletedRecordIds, ['deleted-record-1']);
     });
+
+    test('getChanges parses new Health Connect series metrics', () async {
+      for (final type in [HealthDataType.POWER, HealthDataType.CYCLING_CADENCE]) {
+        ctx.channel.when('getChanges', {
+          'changes': [
+            {'type': 'upsert', 'dataTypeKey': type.name, 'dataPoint': HealthFixtures.numericPoint(value: 250)},
+          ],
+          'nextChangesToken': 'next-token',
+          'hasMore': false,
+          'changesTokenExpired': false,
+        });
+
+        final response = await ctx.health.getChanges(changesToken: 'token-1');
+
+        expect(response!.upsertedDataPoints.single.type, type);
+        expect(response.upsertedDataPoints.single.value, isA<NumericHealthValue>());
+      }
+    });
   });
 }

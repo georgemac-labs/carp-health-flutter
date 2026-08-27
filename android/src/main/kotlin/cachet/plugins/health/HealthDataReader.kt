@@ -426,6 +426,8 @@ class HealthDataReader(
                             totalValue = totalValue.inKilocalories
                         } else if (totalValue is TemperatureDelta) {
                             totalValue = totalValue.inCelsius
+                        } else if (totalValue is Power) {
+                            totalValue = totalValue.inWatts
                         }
 
                         val packageNames = durationResult.result.dataOrigins

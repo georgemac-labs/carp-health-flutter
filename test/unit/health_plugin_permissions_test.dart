@@ -79,6 +79,31 @@ void main() {
       expect(args['permissions'], [HealthDataAccess.READ.index]);
     });
 
+    test('forwards CardioSnap metric permissions', () async {
+      ctx.channel.when('requestAuthorization', true);
+      const types = [
+        HealthDataType.RUNNING_SPEED,
+        HealthDataType.CYCLING_SPEED,
+        HealthDataType.ROWING_SPEED,
+        HealthDataType.RUNNING_POWER,
+        HealthDataType.CYCLING_POWER,
+        HealthDataType.POWER,
+        HealthDataType.CYCLING_CADENCE,
+        HealthDataType.DISTANCE_ROWING,
+      ];
+
+      expect(
+        await ctx.health.requestAuthorization(
+          types,
+          permissions: List.filled(types.length, HealthDataAccess.READ_WRITE),
+        ),
+        isTrue,
+      );
+      final args = Map<String, dynamic>.from(ctx.channel.lastCallFor('requestAuthorization')!.arguments as Map);
+      expect(args['types'], types.map((type) => type.name).toList());
+      expect(args['permissions'], List.filled(types.length, HealthDataAccess.READ_WRITE.index));
+    });
+
     test('revokePermissions calls channel', () async {
       await ctx.health.revokePermissions();
 

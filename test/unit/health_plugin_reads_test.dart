@@ -41,6 +41,30 @@ void main() {
       expect(args['recordingMethodsToFilter'], [RecordingMethod.manual.toInt()]);
     });
 
+    test('parses activity-specific HealthKit metrics', () async {
+      ctx.channel.when('getData', [HealthFixtures.numericPoint(value: 12.5)]);
+
+      for (final type in [
+        HealthDataType.RUNNING_SPEED,
+        HealthDataType.CYCLING_SPEED,
+        HealthDataType.ROWING_SPEED,
+        HealthDataType.RUNNING_POWER,
+        HealthDataType.CYCLING_POWER,
+        HealthDataType.CYCLING_CADENCE,
+        HealthDataType.DISTANCE_ROWING,
+      ]) {
+        final result = await ctx.health.getHealthDataFromTypes(
+          types: [type],
+          startTime: HealthFixtures.start,
+          endTime: HealthFixtures.end,
+        );
+
+        expect(result.single.type, type);
+        expect(result.single.unit, dataTypeToUnit[type]);
+        expect((result.single.value as NumericHealthValue).numericValue, 12.5);
+      }
+    });
+
     test('getHealthDataByUUID throws when UUID is empty', () {
       expect(
         () => ctx.health.getHealthDataByUUID(uuid: '', type: HealthDataType.HEART_RATE),

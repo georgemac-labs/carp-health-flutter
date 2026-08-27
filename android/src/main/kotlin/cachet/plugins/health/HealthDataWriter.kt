@@ -850,6 +850,36 @@ class HealthDataWriter(
                             endZoneOffset = null,
                             metadata = metadata,
                     )
+            POWER ->
+                    PowerRecord(
+                            startTime = Instant.ofEpochMilli(startTime),
+                            endTime = Instant.ofEpochMilli(endTime),
+                            samples =
+                                    listOf(
+                                            PowerRecord.Sample(
+                                                    time = Instant.ofEpochMilli(startTime),
+                                                    power = Power.watts(value),
+                                            )
+                                    ),
+                            startZoneOffset = null,
+                            endZoneOffset = null,
+                            metadata = metadata,
+                    )
+            CYCLING_CADENCE ->
+                    CyclingPedalingCadenceRecord(
+                            startTime = Instant.ofEpochMilli(startTime),
+                            endTime = Instant.ofEpochMilli(endTime),
+                            samples =
+                                    listOf(
+                                            CyclingPedalingCadenceRecord.Sample(
+                                                    time = Instant.ofEpochMilli(startTime),
+                                                    revolutionsPerMinute = value,
+                                            )
+                                    ),
+                            startZoneOffset = null,
+                            endZoneOffset = null,
+                            metadata = metadata,
+                    )
             BLOOD_PRESSURE_SYSTOLIC -> {
                 Log.e("FLUTTER_HEALTH::ERROR", "You must use the [writeBloodPressure] API")
                 null
@@ -941,6 +971,8 @@ class HealthDataWriter(
         private const val WORKOUT = "WORKOUT"
         private const val NUTRITION = "NUTRITION"
         private const val SPEED = "SPEED"
+        private const val POWER = "POWER"
+        private const val CYCLING_CADENCE = "CYCLING_CADENCE"
         private const val ACTIVITY_INTENSITY = "ACTIVITY_INTENSITY"
 
         // Recording method mapping expected from Flutter side

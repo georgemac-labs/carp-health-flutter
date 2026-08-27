@@ -94,6 +94,85 @@ void main() {
       expect(args['dataUnitKey'], HealthDataUnit.BEATS_PER_MINUTE.name);
       expect(args['recordingMethod'], RecordingMethod.manual.toInt());
     });
+
+    test(
+      'forwards Health Connect power and cycling cadence payloads',
+      () async {
+        ctx.channel.when('writeData', true);
+
+        for (final (type, value, unit) in [
+          (HealthDataType.POWER, 250.0, HealthDataUnit.WATT),
+          (HealthDataType.CYCLING_CADENCE, 90.0, HealthDataUnit.REVOLUTIONS_PER_MINUTE),
+        ]) {
+          expect(
+            await ctx.health.writeHealthData(
+              value: value,
+              type: type,
+              startTime: HealthFixtures.start,
+              endTime: HealthFixtures.end,
+            ),
+            isTrue,
+          );
+          final args = Map<String, dynamic>.from(ctx.channel.lastCallFor('writeData')!.arguments as Map);
+          expect(args['dataTypeKey'], type.name);
+          expect(args['dataUnitKey'], unit.name);
+          expect(args['value'], value);
+        }
+      },
+      skip: Platform.isAndroid ? null : 'Health Connect metrics are Android-only',
+    );
+
+    test('forwards activity-specific HealthKit metric payloads', () async {
+      ctx.channel.when('writeData', true);
+
+      for (final type in [
+        HealthDataType.RUNNING_SPEED,
+        HealthDataType.CYCLING_SPEED,
+        HealthDataType.ROWING_SPEED,
+        HealthDataType.RUNNING_POWER,
+        HealthDataType.CYCLING_POWER,
+        HealthDataType.CYCLING_CADENCE,
+        HealthDataType.DISTANCE_ROWING,
+      ]) {
+        expect(
+          await ctx.health.writeHealthData(
+            value: 10,
+            type: type,
+            startTime: HealthFixtures.start,
+            endTime: HealthFixtures.end,
+          ),
+          isTrue,
+        );
+        final args = Map<String, dynamic>.from(ctx.channel.lastCallFor('writeData')!.arguments as Map);
+        expect(args['dataTypeKey'], type.name);
+        expect(args['dataUnitKey'], dataTypeToUnit[type]!.name);
+      }
+    });
+  });
+
+  group('writeWorkoutData', () {
+    test('forwards optional HealthKit workout metadata', () async {
+      ctx.channel.when('writeWorkoutData', true);
+
+      final success = await ctx.health.writeWorkoutData(
+        activityType: HealthWorkoutActivityType.RUNNING,
+        start: HealthFixtures.start,
+        end: HealthFixtures.end,
+        isIndoor: true,
+        averageMets: 8.5,
+        averageSpeed: 3.2,
+        maximumSpeed: 4.8,
+        speedUnit: HealthDataUnit.METER_PER_SECOND,
+      );
+
+      expect(success, isTrue);
+      final args = Map<String, dynamic>.from(ctx.channel.lastCallFor('writeWorkoutData')!.arguments as Map);
+      expect(args['isIndoor'], isTrue);
+      expect(args['averageMets'], 8.5);
+      expect(args['averageSpeed'], 3.2);
+      expect(args['maximumSpeed'], 4.8);
+      expect(args['speedUnit'], HealthDataUnit.METER_PER_SECOND.name);
+    });
   });
 
   group('writeActivityIntensity', () {

@@ -213,6 +213,23 @@ Below is a simplified flow of how to use the plugin.
   int? steps = await health.getTotalStepsInInterval(midnight, now);
 ```
 
+### Writing HealthKit workout metadata
+
+`writeWorkoutData` can attach optional indoor, average METs, average speed, and maximum speed metadata to Apple Health workouts. Speed values use metres per second unless `speedUnit` is supplied. These metadata arguments are iOS-only and are ignored on Android.
+
+```dart
+await health.writeWorkoutData(
+  activityType: HealthWorkoutActivityType.RUNNING,
+  start: workoutStart,
+  end: workoutEnd,
+  isIndoor: true,
+  averageMets: 8.5,
+  averageSpeed: 3.2,
+  maximumSpeed: 4.8,
+  speedUnit: HealthDataUnit.METER_PER_SECOND,
+);
+```
+
 ### Writing workout routes (iOS & Android)
 
 1. Request share/read permissions for both `HealthDataType.WORKOUT` and `HealthDataType.WORKOUT_ROUTE`, and ensure location permissions are granted (iOS: Core Location permissions; Android: `ACCESS_FINE_LOCATION` or `ACCESS_COARSE_LOCATION`).
@@ -429,6 +446,7 @@ The plugin supports the following [`HealthDataType`](https://pub.dev/documentati
 | WALKING_HEART_RATE           | BEATS_PER_MINUTE        | yes              |                           |                                                                                                                                    |
 | WEIGHT                       | KILOGRAMS               | yes              | yes                       |                                                                                                                                    |
 | DISTANCE_WALKING_RUNNING     | METERS                  | yes              |                           |                                                                                                                                    |
+| DISTANCE_ROWING              | METER                   | yes (iOS 18+)    |                           | Use `DISTANCE_DELTA` for Health Connect rowing distance                                                                            |
 | FLIGHTS_CLIMBED              | COUNT                   | yes              | yes                       |                                                                                                                                    |
 | DISTANCE_DELTA               | METERS                  |                  | yes                       |                                                                                                                                    |
 | MINDFULNESS                  | MINUTES                 | yes              |                           |                                                                                                                                    |
@@ -468,6 +486,14 @@ The plugin supports the following [`HealthDataType`](https://pub.dev/documentati
 | UV_INDEX                     | COUNT                   | yes              |                           |                                                                                                                                    |
 | LEAN_BODY_MASS               | KILOGRAMS               | yes              | yes                       |                                                                                                                                    |
 | WALKING_SPEED                | METER_PER_SECOND        | yes              | (yes)                     | On Android this will be recorded as `SPEED` with similar unit                                                                      |
+| RUNNING_SPEED                | METER_PER_SECOND        | yes (iOS 16+)    |                           |                                                                                                                                    |
+| CYCLING_SPEED                | METER_PER_SECOND        | yes (iOS 17+)    |                           |                                                                                                                                    |
+| ROWING_SPEED                 | METER_PER_SECOND        | yes (iOS 18+)    |                           |                                                                                                                                    |
+| SPEED                        | METER_PER_SECOND        |                  | yes                       | Generic Health Connect `SpeedRecord`                                                                                               |
+| RUNNING_POWER                | WATT                    | yes (iOS 16+)    |                           |                                                                                                                                    |
+| CYCLING_POWER                | WATT                    | yes (iOS 17+)    |                           |                                                                                                                                    |
+| POWER                        | WATT                    |                  | yes                       | Generic Health Connect `PowerRecord`                                                                                               |
+| CYCLING_CADENCE              | REVOLUTIONS_PER_MINUTE  | yes (iOS 17+)    | yes                       | Bicycle crank cadence; Health Connect uses `CyclingPedalingCadenceRecord`                                                          |
 | APPLE_MOVE_TIME              | SECOND                  | yes              |                           | READ Only                                                                                                                          |
 | APPLE_STAND_HOUR             | HOUR                    | yes              |                           | READ Only                                                                                                                          |
 | APPLE_MOVE_TIME              | SECOND                  | yes              |                           | READ Only                                                                                                                          |

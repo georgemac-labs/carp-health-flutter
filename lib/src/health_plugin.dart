@@ -1508,6 +1508,12 @@ class Health {
   ///    *ONLY FOR IOS* Default value is METER.
   ///  - [title] The title of the workout.
   ///    *ONLY FOR HEALTH CONNECT* Default value is the [activityType], e.g. "STRENGTH_TRAINING".
+  ///  - [isIndoor] Whether the workout was performed indoors. *ONLY FOR IOS*.
+  ///  - [averageMets] The workout's average metabolic equivalent of task. *ONLY FOR IOS*.
+  ///  - [averageSpeed] The workout's average speed. *ONLY FOR IOS*.
+  ///  - [maximumSpeed] The workout's maximum speed. *ONLY FOR IOS*.
+  ///  - [speedUnit] The unit used for [averageSpeed] and [maximumSpeed].
+  ///    *ONLY FOR IOS* Default value is METER_PER_SECOND.
   ///  - [recordingMethod] The recording method of the data point, automatic by default (on iOS this can only be automatic or manual).
   Future<bool> writeWorkoutData({
     required HealthWorkoutActivityType activityType,
@@ -1518,6 +1524,11 @@ class Health {
     int? totalDistance,
     HealthDataUnit totalDistanceUnit = HealthDataUnit.METER,
     String? title,
+    bool? isIndoor,
+    double? averageMets,
+    double? averageSpeed,
+    double? maximumSpeed,
+    HealthDataUnit speedUnit = HealthDataUnit.METER_PER_SECOND,
     RecordingMethod recordingMethod = RecordingMethod.automatic,
   }) async {
     await _checkIfHealthConnectAvailableOnAndroid();
@@ -1540,6 +1551,11 @@ class Health {
       'totalDistance': totalDistance,
       'totalDistanceUnit': totalDistanceUnit.name,
       'title': title,
+      'isIndoor': isIndoor,
+      'averageMets': averageMets,
+      'averageSpeed': averageSpeed,
+      'maximumSpeed': maximumSpeed,
+      'speedUnit': speedUnit.name,
       'recordingMethod': recordingMethod.toInt(),
     };
     return await _channel.invokeMethod('writeWorkoutData', args) == true;

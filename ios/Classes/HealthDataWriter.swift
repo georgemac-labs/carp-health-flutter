@@ -866,6 +866,33 @@ class HealthDataWriter {
         let dateFrom = HealthUtilities.dateFromMilliseconds(startTime.doubleValue)
         let dateTo = HealthUtilities.dateFromMilliseconds(endTime.doubleValue)
 
+        var metadata: [String: Any] = [:]
+        if let isIndoor = arguments["isIndoor"] as? Bool {
+            metadata[HKMetadataKeyIndoorWorkout] = NSNumber(value: isIndoor)
+        }
+        if let averageMets = arguments["averageMets"] as? Double {
+            metadata[HKMetadataKeyAverageMETs] = HKQuantity(
+                unit: HKUnit(from: "kcal/(kg*hr)"),
+                doubleValue: averageMets
+            )
+        }
+        if let speedUnitKey = arguments["speedUnit"] as? String,
+           let speedUnit = unitDict[speedUnitKey]
+        {
+            if let averageSpeed = arguments["averageSpeed"] as? Double {
+                metadata[HKMetadataKeyAverageSpeed] = HKQuantity(
+                    unit: speedUnit,
+                    doubleValue: averageSpeed
+                )
+            }
+            if let maximumSpeed = arguments["maximumSpeed"] as? Double {
+                metadata[HKMetadataKeyMaximumSpeed] = HKQuantity(
+                    unit: speedUnit,
+                    doubleValue: maximumSpeed
+                )
+            }
+        }
+
         let workout = HKWorkout(
             activityType: activityTypeValue,
             start: dateFrom,
@@ -873,7 +900,7 @@ class HealthDataWriter {
             duration: dateTo.timeIntervalSince(dateFrom),
             totalEnergyBurned: totalEnergyBurned ?? nil,
             totalDistance: totalDistance ?? nil,
-            metadata: nil
+            metadata: metadata.isEmpty ? nil : metadata
         )
 
         healthStore.save(
